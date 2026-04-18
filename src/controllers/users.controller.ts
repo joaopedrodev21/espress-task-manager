@@ -6,7 +6,7 @@ import { updateUserSchema } from "../schemas/user.schema.js";
 const userRepository = new UserRepository();
 
 export class UserController {
-    async getAll(req: Resquet, res: Response){
+    async getAll(req: Request, res: Response){
         const users = await userRepository.getAll();
         res.json(users);
     };
@@ -18,9 +18,11 @@ export class UserController {
                 message: "name e email são obrigatórios"
             })
         }
+        const validatedData = createUserSchema.parse(req.body);
         const user = await userRepository.create({
             name,
-            email
+            email,
+            validatedData
         });
         return res.status(201).json(user);
     };

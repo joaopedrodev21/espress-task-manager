@@ -33,7 +33,7 @@ export class UserController {
         }
         const user = await userRepository.getById(userId);
 
-        if(user!){
+        if(!user){
             return res.status(404).json({
                 message: "Usuário não encontrado"
             })

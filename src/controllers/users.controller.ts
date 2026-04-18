@@ -1,6 +1,7 @@
 import { type Request, type Response } from "express";
 import { UserRepository } from "../repositories/user.repository.js"
 import { createUserSchema } from "../schemas/user.schema.js"
+import { updateUserSchema } from "../schemas/user.schema.js";
 
 const userRepository = new UserRepository();
 
@@ -62,6 +63,7 @@ export class UserController {
             userId,
             validatedData,
         );
+        return res.json(user);
     }
     async delete(req: Request, res: Response){
         const userId = Number(req.params.id);

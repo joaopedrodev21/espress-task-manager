@@ -10,22 +10,20 @@ export class UserController {
         const users = await userRepository.getAll();
         res.json(users);
     };
-    async create(req: Request, res: Response){
-        const {name, email} = req.body;
-        
-        if(!name || !email){
+    async create(req: Request, res: Response) {
+        try {
+            const validatedData = createUserSchema.parse(req.body);
+
+            const user = await userRepository.create(validatedData);
+
+            return res.status(201).json(user);
+
+        } catch (error: any) {
             return res.status(400).json({
-                message: "name e email são obrigatórios"
-            })
+            message: error.errors?.[0]?.message || "Dados inválidos"
+            });
         }
-        const validatedData = createUserSchema.parse(req.body);
-        const user = await userRepository.create({
-            name,
-            email,
-            validatedData
-        });
-        return res.status(201).json(user);
-    };
+    }
     async getById(req: Request, res: Response){
         const userId = Number(req.params.id);
 

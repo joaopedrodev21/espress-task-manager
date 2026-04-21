@@ -64,9 +64,12 @@ export class UserController {
             }
 
             const validatedData = updateUserSchema.parse(req.body);
+            const updateData: any = {};
+            if (validatedData.name !== undefined) updateData.name = validatedData.name;
+            if (validatedData.email !== undefined) updateData.email = validatedData.email;
             const user = await userRepository.update(
                 userId,
-                validatedData,
+                updateData,
             );
             return res.json(user);
         } catch (error: any) {

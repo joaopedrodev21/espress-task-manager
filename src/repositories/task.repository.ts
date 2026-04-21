@@ -1,9 +1,10 @@
 import { prisma } from "../database/prismaClient.js";
+import { Prisma } from "@prisma/client";
 
 //Criação do TaskRepository com crud de tarefas
 
 export class TaskRepository {
-    create(data: any){
+    create(data: Prisma.TaskCreateInput){
         return prisma.task.create({data});
     }
     getAll(){
@@ -12,7 +13,7 @@ export class TaskRepository {
     getById(id: number){
         return prisma.task.findUnique({where: {id}});
     }
-    update(id: number, data: any){
+    update(id: number, data: Prisma.TaskUpdateInput){
         return prisma.task.update({where: {id}, data});
     }
     delete(id: number){

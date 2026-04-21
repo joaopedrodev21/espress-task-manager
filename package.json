@@ -19,7 +19,6 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@prisma/adapter-mariadb": "^7.4.0",
     "@prisma/client": "^6.19.2",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",

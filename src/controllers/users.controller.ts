@@ -25,56 +25,70 @@ export class UserController {
         }
     }
     async getById(req: Request, res: Response){
-        const userId = Number(req.params.id);
+        try {
+            const userId = Number(req.params.id);
 
-        if(isNaN(userId)){
-            return res.status(400).json({
-                message: "ID inválido"
-            });
-        }
-        const user = await userRepository.getById(userId);
+            if(isNaN(userId)){
+                return res.status(400).json({
+                    message: "ID inválido"
+                });
+            }
+            const user = await userRepository.getById(userId);
 
-        if(!user){
-            return res.status(404).json({
-                message: "Usuário não encontrado"
-            })
+            if(!user){
+                return res.status(404).json({
+                    message: "Usuário não encontrado"
+                })
+            }
+            return res.json(user);
+        } catch (error) {
+            res.status(500).json({ message: "Erro interno do servidor" });
         }
-        return res.json(user);
     }
     async update(req: Request, res: Response){
-        const userId = Number(req.params.id)
-        
-        if(isNaN(userId)){
+        try {
+            const userId = Number(req.params.id)
+            
+            if(isNaN(userId)){
+                return res.status(400).json({
+                    message: "ID inválido"
+                });
+            }
+
+            const userExists = await userRepository.getById(userId);
+
+            if(!userExists){
+                return res.status(404).json({
+                    message: "Usuário não encontrado"
+                });
+            }
+
+            const validatedData = updateUserSchema.parse(req.body);
+            const user = await userRepository.update(
+                userId,
+                validatedData,
+            );
+            return res.json(user);
+        } catch (error: any) {
             return res.status(400).json({
-                message: "ID inválido"
+            message: error.errors?.[0]?.message || "Dados inválidos"
             });
         }
-
-        const userExists = await userRepository.getById(userId);
-
-        if(!userExists){
-            return res.status(404).json({
-                message: "Usuário não encontrado"
-            });
-        }
-
-        const validatedData = updateUserSchema.parse(req.body);
-        const user = await userRepository.update(
-            userId,
-            validatedData,
-        );
-        return res.json(user);
     }
     async delete(req: Request, res: Response){
-        const userId = Number(req.params.id);
+        try {
+            const userId = Number(req.params.id);
 
-        if(isNaN(userId)){
-            return res.status(400).json({
-                message: "ID inválido"
-            });
+            if(isNaN(userId)){
+                return res.status(400).json({
+                    message: "ID inválido"
+                });
+            }
+
+            await userRepository.delete(userId)
+            return res.status(204).send()
+        } catch (error) {
+            res.status(500).json({ message: "Erro interno do servidor" });
         }
-
-        await userRepository.delete(userId)
-        return res.status(204).send()
     }
 }

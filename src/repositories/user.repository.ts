@@ -12,6 +12,9 @@ export class UserRepository {
     getById(id: number){
         return prisma.user.findUnique({where: {id}})
     }
+    getByEmail(email: string){
+        return prisma.user.findUnique({where: {email}})
+    }
     update(id: number, data: Prisma.UserUpdateInput){
         return prisma.user.update({where: {id}, data})
     }

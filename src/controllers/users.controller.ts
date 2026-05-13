@@ -10,7 +10,7 @@ export class UserController {
         const users = await userRepository.getAll();
         res.json(users);
     };
-    async create(req: Request, res: Response) {
+    async create(req: Request, res: Response){
         try {
             const validatedData = createUserSchema.parse(req.body);
 

@@ -23,3 +23,11 @@ export const updateTaskSchema = z.object({
 {
   message: "Envie ao menos um campo para atualizar"
 });
+export const listTasksQuerySchema = z.object({
+  done: z.enum(["true", "false"]).optional(),
+  priority: z.enum(["LOW", "HIGH"]).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(10),
+  sortBy: z.enum(["createdAt", "dueDate", "priority"]).default("createdAt"),
+  order: z.enum(["asc", "desc"]).default("desc"),
+});

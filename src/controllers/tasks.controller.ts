@@ -1,14 +1,32 @@
 import { type Request, type Response } from "express";
 import { TaskRepository } from "../repositories/task.repository.js";
 import { createTaskSchema, updateTaskSchema } from "../schemas/task.schema.js";
+import { listTasksQuerySchema } from "../schemas/task.schema.js";
 
 const taskRepository = new TaskRepository();
 
 export class TaskController {
   async getAll(req: Request, res: Response) {
-    const userId = req.user!.id;
-    const tasks = await taskRepository.getAllByUser(userId);
-    return res.json(tasks);
+    try {
+      const userId = req.user!.id;
+      
+      const query = listTasksQuerySchema.parse(req.query);
+
+      const done = query.done === undefined ? undefined : query.done === "true";
+
+      const result = await taskRepository.getAllByUserWithFilters({
+        userId,
+        page: query.page,
+        limit: query.limit,
+        sortBy: query.sortBy,
+        order: query.order,
+        ...(done !== undefined ? { done } : {}),
+        ...(query.priority !== undefined ? { priority: query.priority } : {}),
+      });
+      return res.json(result);
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
   }
 
   async create(req: Request, res: Response) {

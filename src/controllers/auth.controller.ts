@@ -1,74 +1,40 @@
 import { type Request, type Response } from 'express';
 import { registerSchema } from '../schemas/auth.schema.js';
 import { loginSchema } from '../schemas/auth.schema.js';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { UserRepository } from '../repositories/user.repository.js';
+import { AuthService } from '../services/auth.service.js';
 
-const userRepository = new UserRepository();
+const authService = new AuthService();
 
 export class AuthController {
     async register(req: Request, res: Response){
         try{
             const validatedData = registerSchema.parse(req.body);
 
-            const userAlreadyExists = await userRepository.getByEmail(validatedData.email);
-            if(userAlreadyExists){
-                return res.status(409).json({
-                    message: "Email já cadastrado, esse usuário já existe."
-                });
-            }
-
-            const passwordHash = await bcrypt.hash(validatedData.password, 10);
-            
-            const user = await userRepository.create({
-                name: validatedData.name,
-                email: validatedData.email,
-                passwordHash,
-            });
+            const user = await authService.register(
+                validatedData.name,
+                validatedData.email,
+                validatedData.password,
+            );
 
             return res.status(201).json(user);
         }
         catch(error: any){
-            res.status(400).json({
-                message:  error.errors?.[0]?.message || "Dados inválidos",
-            })
+            return res.status(error.statusCode ?? 400).json({
+                message: error.errors?.[0]?.message || error.message || "Dados inválidos",
+            });
         }
     }
     async login(req: Request, res: Response){
         try{
             const validatedData = loginSchema.parse(req.body);
 
-            const user = await userRepository.getByEmail(validatedData.email);
-            if(!user){
-                return res.status(401).json({
-                    message: "Credenciais inválidas"
-                });
-            }
-
-            const passwordIsValid = await bcrypt.compare(validatedData.password, user .passwordHash);
-            if(!passwordIsValid){
-                return res.status(401).json({
-                    message: "Credenciais inválidas"
-                });
-            }
-
-            const secret = process.env.JWT_SECRET;
-            if(!secret){
-                return res.status(500).json({
-                    message: "JWT_SECRET não configurado"
-                })
-            }
-
-            const token = jwt.sign({ sub: user.id, email: user.email }, secret, { expiresIn: '1h' });
-
-            const {passwordHash: _, ...safeUser} = user;
-            return res.json({ token, user: safeUser });
+            const result = await authService.login(validatedData.email, validatedData.password);
+            return res.json(result);
         }
         catch(error: any){
-            return res.status(400).json({
-                message: error.errors?.[0]?.message || "Dados inválidos",
-            })
+            return res.status(error.statusCode ?? 400).json({
+                message: error.errors?.[0]?.message || error.message || "Dados inválidos",
+            });
         } 
     }
 }

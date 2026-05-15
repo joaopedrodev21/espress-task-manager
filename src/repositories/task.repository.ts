@@ -19,4 +19,27 @@ export class TaskRepository {
     deleteByIdAndUser(id: number, userId: number){
         return prisma.task.deleteMany({ where: { id, userId } });
     }
+    async getAllByUserWithFilters(params: {
+        userId: number;
+        done?: boolean;
+        priority?: "LOW" | "HIGH";
+        page?: number;
+        limit?: number;
+        sortBy?: "createdAt" | "dueDate" | "priority";
+        order?: "asc" | "desc";
+     }) {
+        const { userId, done, priority, page, limit = 10, sortBy = "createdAt", order = "desc" } = params;
+        const where: Prisma.TaskWhereInput = { userId, ...(done !== undefined ? { done } : {}), ...(priority ? { priority } : {}) };
+
+        const [itens, total] = await Promise.all([
+            prisma.task.findMany({
+                where,
+                orderBy: { [sortBy]: order },
+                skip: ((page ?? 1) - 1) * limit,
+                take: limit
+            }),
+            prisma.task.count({ where })
+        ])
+        return { itens, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    }; 
 }

@@ -27,12 +27,11 @@ export class AuthController {
                 passwordHash,
             });
 
-            const {passwordHash: _, ...safeUser} = user;
-            res.status(201).json(safeUser);
+            return res.status(201).json(user);
         }
         catch(error: any){
             res.status(400).json({
-                message: error.errors?.[0]?.message || "Dados inválidos",
+                message:  error.errors?.[0]?.message || "Dados inválidos",
             })
         }
     }

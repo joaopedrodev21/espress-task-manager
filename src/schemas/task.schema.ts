@@ -2,7 +2,6 @@ import { z } from "zod";
 
 export const createTaskSchema = z.object({
   title: z.string().min(1, "Título é obrigatório"),
-  userId: z.number().int().positive("userId deve ser um número positivo"),
   priority: z.enum(["LOW", "HIGH"]).optional().default("LOW"),
   done: z.boolean().optional().default(false),
   description: z.string().optional(),

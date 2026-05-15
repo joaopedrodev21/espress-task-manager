@@ -7,16 +7,16 @@ export class TaskRepository {
     create(data: Prisma.TaskCreateInput){
         return prisma.task.create({data});
     }
-    getAll(){
-        return prisma.task.findMany();
+    getAllByUser(userId: number){
+        return prisma.task.findMany({ where: { userId } });
     }
-    getById(id: number){
-        return prisma.task.findUnique({where: {id}});
+    getByIdAndUser(id: number, userId: number){
+        return prisma.task.findFirst({ where: { id, userId } });
     }
-    update(id: number, data: Prisma.TaskUpdateInput){
-        return prisma.task.update({where: {id}, data});
+    updateByIdAndUser(id: number, userId: number, data: Prisma.TaskUpdateInput){
+        return prisma.task.updateMany({ where: { id, userId }, data });
     }
-    delete(id: number){
-        return prisma.task.delete({where: {id}});
+    deleteByIdAndUser(id: number, userId: number){
+        return prisma.task.deleteMany({ where: { id, userId } });
     }
 }

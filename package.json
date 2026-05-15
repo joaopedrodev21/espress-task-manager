@@ -1,12 +1,14 @@
 {
-  "name": "test-sql",
+  "name": "manager-tasks-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Task management server built with Express and Prisma",
   "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",

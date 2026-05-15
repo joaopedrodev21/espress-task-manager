@@ -24,7 +24,7 @@ model User {
   name      String
   email     String   @unique
   tasks     Task[]
-  passwordHash String @default("temp_password")
+  passwordHash String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
